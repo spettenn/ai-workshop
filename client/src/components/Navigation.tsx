@@ -22,6 +22,7 @@ export function Navigation() {
 		{ href: '/dashboard', label: 'Dashboard', icon: '🏠' },
 		{ href: '/predictions', label: 'Predictions', icon: '⚽' },
 		{ href: '/leaderboard', label: 'Leaderboard', icon: '🏆' },
+		{ href: '/info', label: 'Info', icon: 'ℹ️' },
 	];
 
 	const isActive = (href: string) => {
