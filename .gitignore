@@ -12,6 +12,8 @@ pnpm-debug.log*
 .env.test.local
 .env.production.local
 
+/BACKUPS-DONT-CHANGE/
+
 # Build outputs
 dist/
 build/

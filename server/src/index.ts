@@ -20,6 +20,7 @@ const server = createServer(app);
 // Allow both Next.js and Vite origins for development
 const allowedOrigins = [
 	'http://localhost:3000', // Next.js default
+	'http://localhost:3002', // Next.js alternative port
 	'http://localhost:5173', // Vite default
 	process.env.CLIENT_ORIGIN,
 ].filter((origin): origin is string => Boolean(origin));
