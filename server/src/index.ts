@@ -9,15 +9,24 @@ import { Server as SocketIOServer } from 'socket.io';
 // Import routes
 import authRoutes from './routes/auth';
 import matchRoutes from './routes/matches';
+import predictionRoutes from './routes/predictions';
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const server = createServer(app);
+
+// Allow both Next.js and Vite origins for development
+const allowedOrigins = [
+	'http://localhost:3000', // Next.js default
+	'http://localhost:5173', // Vite default
+	process.env.CLIENT_ORIGIN,
+].filter((origin): origin is string => Boolean(origin));
+
 const io = new SocketIOServer(server, {
 	cors: {
-		origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+		origin: allowedOrigins,
 		methods: ['GET', 'POST'],
 	},
 });
@@ -28,7 +37,7 @@ const PORT = process.env.PORT || 3001;
 app.use(helmet());
 app.use(
 	cors({
-		origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+		origin: allowedOrigins,
 		credentials: true,
 	})
 );
@@ -48,6 +57,7 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/matches', matchRoutes);
+app.use('/api/predictions', predictionRoutes);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
@@ -105,6 +115,7 @@ server.listen(PORT, () => {
 	console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
 	console.log(`⚽ Match endpoints: http://localhost:${PORT}/api/matches`);
 	console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+	console.log(`🔗 CORS origins: ${allowedOrigins.join(', ')}`);
 });
 
 // Graceful shutdown
