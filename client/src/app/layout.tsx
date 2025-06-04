@@ -9,8 +9,9 @@ import { Toaster } from '@/components/ui/sonner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-	title: 'Soccer World Cup Betting Pool',
-	description: 'Internal betting pool for the FIFA World Cup 2026',
+	title: 'Eltek World Cup Betting Pool',
+	description:
+		'Internal betting pool for the FIFA World Cup 2026 - Eltek Holding',
 };
 
 export default function RootLayout({
@@ -23,9 +24,9 @@ export default function RootLayout({
 			<body className={inter.className}>
 				<AuthProvider>
 					<SocketProvider>
-						<div className='min-h-screen bg-gray-50'>
+						<div className='min-h-screen bg-background'>
 							<Navigation />
-							<main>{children}</main>
+							<main className='relative'>{children}</main>
 						</div>
 						<Toaster position='top-right' richColors />
 					</SocketProvider>

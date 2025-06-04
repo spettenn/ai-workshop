@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -39,115 +40,126 @@ export function Navigation() {
 	};
 
 	return (
-		<header className='bg-white shadow-sm border-b sticky top-0 z-50'>
+		<header className='nav-blur sticky top-0 z-50 border-b border-border/40'>
 			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
 				<div className='flex items-center justify-between h-16'>
 					{/* Logo and Title */}
-					<div className='flex items-center space-x-4'>
-						<Link href='/dashboard' className='flex items-center space-x-2'>
-							<span className='text-2xl'>⚽</span>
-							<h1 className='text-xl font-bold text-gray-900'>
-								World Cup Betting Pool
-							</h1>
+					<div className='flex items-center space-x-6'>
+						<Link
+							href='/dashboard'
+							className='flex items-center space-x-3 group'>
+							<div className='flex items-center space-x-3'>
+								<div className='w-10 h-8 relative group-hover:scale-110 transition-transform'>
+									<Image
+										src='/eltek-logo.svg'
+										alt='Eltek Holding'
+										fill
+										className='object-contain'
+										priority
+									/>
+								</div>
+								<div className='flex flex-col'>
+									<span className='text-lg font-semibold text-foreground leading-none'>
+										Eltek
+									</span>
+									<span className='text-xs text-muted-foreground leading-none'>
+										World Cup Pool
+									</span>
+								</div>
+							</div>
 						</Link>
 
 						{/* Connection Status */}
-						<div className='flex items-center space-x-2'>
+						<div className='hidden sm:flex items-center space-x-2'>
 							<div
 								className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-							<span className='text-xs text-gray-500'>
+							<span className='text-xs text-muted-foreground'>
 								{isConnected ? 'Live' : 'Offline'}
 							</span>
 						</div>
 					</div>
 
 					{/* Desktop Navigation */}
-					<div className='hidden md:flex items-center space-x-4'>
+					<div className='hidden md:flex items-center space-x-1'>
 						{/* Dashboard Link */}
 						<Link href='/dashboard'>
 							<Button
 								variant={isActive('/dashboard') ? 'default' : 'ghost'}
 								size='sm'
-								className='flex items-center space-x-2'>
-								<span>🏠</span>
-								<span>Dashboard</span>
+								className='btn-animate'>
+								Dashboard
 							</Button>
 						</Link>
 
-						{/* Navigation Dropdown */}
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant='ghost'
-									size='sm'
-									className='flex items-center space-x-2'>
-									<span>📋</span>
-									<span>Menu</span>
-									<span className='text-xs'>▼</span>
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align='end' className='w-48'>
-								{navItems.map((item) => (
-									<DropdownMenuItem key={item.href} asChild>
-										<Link
-											href={item.href}
-											className={`flex items-center space-x-2 w-full ${
-												isActive(item.href) ? 'bg-gray-100' : ''
-											}`}>
-											<span>{item.icon}</span>
-											<span>{item.label}</span>
-										</Link>
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
-
-						{/* User Menu */}
-						<div className='flex items-center space-x-3'>
-							<div className='text-sm text-gray-700'>
-								<span className='font-medium'>{user?.name}</span>
-							</div>
-							<Button variant='outline' size='sm' onClick={logout}>
-								Logout
-							</Button>
-						</div>
-					</div>
-
-					{/* Mobile User Menu */}
-					<div className='md:hidden flex items-center space-x-2'>
-						<div className='text-sm text-gray-700'>
-							<span className='font-medium text-xs'>{user?.name}</span>
-						</div>
-						<Button variant='outline' size='sm' onClick={logout}>
-							Logout
-						</Button>
-					</div>
-				</div>
-
-				{/* Mobile Navigation */}
-				<div className='md:hidden border-t border-gray-200'>
-					<nav className='flex items-center justify-around py-2'>
-						<Link href='/dashboard'>
-							<Button
-								variant={isActive('/dashboard') ? 'default' : 'ghost'}
-								size='sm'
-								className='flex flex-col items-center space-y-1 h-auto py-2'>
-								<span className='text-lg'>🏠</span>
-								<span className='text-xs'>Dashboard</span>
-							</Button>
-						</Link>
+						{/* Direct Navigation Links */}
 						{navItems.map((item) => (
 							<Link key={item.href} href={item.href}>
 								<Button
 									variant={isActive(item.href) ? 'default' : 'ghost'}
 									size='sm'
-									className='flex flex-col items-center space-y-1 h-auto py-2'>
-									<span className='text-lg'>{item.icon}</span>
-									<span className='text-xs'>{item.label}</span>
+									className='btn-animate'>
+									{item.label}
 								</Button>
 							</Link>
 						))}
-					</nav>
+
+						{/* User Menu */}
+						<div className='flex items-center space-x-3 ml-4 pl-4 border-l border-border'>
+							<div className='text-sm'>
+								<span className='font-medium text-foreground'>
+									{user?.name}
+								</span>
+							</div>
+							<Button
+								variant='outline'
+								size='sm'
+								onClick={logout}
+								className='btn-animate'>
+								Logout
+							</Button>
+						</div>
+					</div>
+
+					{/* Mobile Navigation */}
+					<div className='md:hidden flex items-center space-x-2'>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant='ghost'
+									size='sm'
+									className='flex items-center space-x-1'>
+									<span>Menu</span>
+									<span className='text-xs'>▼</span>
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align='end' className='w-48'>
+								<DropdownMenuItem asChild>
+									<Link
+										href='/dashboard'
+										className='flex items-center space-x-2 w-full'>
+										<span>🏠</span>
+										<span>Dashboard</span>
+									</Link>
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								{navItems.map((item) => (
+									<DropdownMenuItem key={item.href} asChild>
+										<Link
+											href={item.href}
+											className='flex items-center space-x-2 w-full'>
+											<span>{item.icon}</span>
+											<span>{item.label}</span>
+										</Link>
+									</DropdownMenuItem>
+								))}
+								<DropdownMenuSeparator />
+								<DropdownMenuItem onClick={logout} className='text-destructive'>
+									Logout
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+						<div className='text-xs text-muted-foreground'>{user?.name}</div>
+					</div>
 				</div>
 			</div>
 		</header>

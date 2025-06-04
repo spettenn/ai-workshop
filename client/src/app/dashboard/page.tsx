@@ -25,6 +25,7 @@ import {
 } from '@/types/prediction';
 import { PredictionForm } from '@/components/PredictionForm';
 import { Leaderboard } from '@/components/Leaderboard';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function DashboardPage() {
@@ -90,10 +91,22 @@ export default function DashboardPage() {
 
 	if (authLoading || !user) {
 		return (
-			<div className='min-h-screen flex items-center justify-center'>
-				<div className='text-center'>
-					<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto'></div>
-					<p className='mt-2 text-gray-600'>Loading...</p>
+			<div className='min-h-screen flex items-center justify-center hero-section'>
+				<div className='text-center relative z-10'>
+					<div className='w-20 h-16 relative mx-auto mb-6 animate-pulse'>
+						<Image
+							src='/eltek-logo.svg'
+							alt='Eltek Holding'
+							fill
+							className='object-contain'
+							priority
+						/>
+					</div>
+					<h1 className='text-2xl font-semibold text-foreground mb-4'>
+						Loading Dashboard...
+					</h1>
+					<div className='animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto'></div>
+					<p className='mt-4 text-muted-foreground'>Please wait</p>
 				</div>
 			</div>
 		);
@@ -138,7 +151,9 @@ export default function DashboardPage() {
 
 	const getMatchStatusBadge = (match: Match) => {
 		if (match.status === 'LIVE') {
-			return <Badge className='bg-red-500 animate-pulse'>🔴 LIVE</Badge>;
+			return (
+				<Badge className='bg-red-500 animate-pulse text-white'>🔴 LIVE</Badge>
+			);
 		}
 		if (match.status === 'FINISHED') {
 			return <Badge variant='secondary'>✅ Finished</Badge>;
@@ -183,7 +198,7 @@ export default function DashboardPage() {
 		return (
 			<Card
 				key={`${source}-${match.id}`}
-				className='hover:shadow-md transition-shadow'>
+				className='card-hover border border-border'>
 				<CardHeader className='pb-3'>
 					<div className='flex items-center justify-between'>
 						<div className='flex items-center space-x-2'>
@@ -195,8 +210,9 @@ export default function DashboardPage() {
 							)}
 						</div>
 						<div className='flex items-center space-x-1'>
-							<div className='w-2 h-2 rounded-full bg-green-500'></div>
-							<span className='text-xs text-gray-500'>
+							<div
+								className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+							<span className='text-xs text-muted-foreground'>
 								{isConnected ? 'Live' : 'Offline'}
 							</span>
 						</div>
@@ -206,174 +222,227 @@ export default function DashboardPage() {
 					</CardTitle>
 					<CardDescription>
 						{formatDate(match.kickoffTime)}
-						{match.round && ` • ${match.round}`}
 						{match.venue && ` • ${match.venue}`}
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
-					{/* Match Score */}
-					<div className='text-center mb-4'>
-						{match.status === 'FINISHED' || match.status === 'LIVE' ? (
-							<div className='text-3xl font-bold'>
-								{match.homeScore ?? 0} - {match.awayScore ?? 0}
-							</div>
-						) : (
-							<div className='text-xl text-gray-400'>- : -</div>
-						)}
-					</div>
-
-					{/* User's Prediction */}
-					{prediction && (
-						<div className='mb-4 p-3 bg-blue-50 rounded-lg'>
-							<div className='text-sm font-medium text-center mb-1'>
-								Your Prediction
-							</div>
-							<div className='text-lg font-bold text-center'>
-								{prediction.homeGoals} - {prediction.awayGoals}
-							</div>
-							{prediction.points > 0 && (
-								<div className='text-center mt-1'>
-									<Badge className='bg-green-500'>
-										+{prediction.points} points
-									</Badge>
+					<div className='space-y-3'>
+						{/* Match Score */}
+						{match.status === MatchStatus.FINISHED && (
+							<div className='text-center p-3 bg-muted rounded-lg'>
+								<div className='text-2xl font-bold text-foreground'>
+									{match.homeScore} - {match.awayScore}
 								</div>
+								<div className='text-sm text-muted-foreground'>Final Score</div>
+							</div>
+						)}
+
+						{/* User Prediction */}
+						{prediction && (
+							<div className='p-3 bg-primary/5 border border-primary/20 rounded-lg'>
+								<div className='flex items-center justify-between'>
+									<span className='text-sm font-medium text-foreground'>
+										Your Prediction:
+									</span>
+									<span className='text-sm font-bold text-primary'>
+										{prediction.homeScore} - {prediction.awayScore}
+									</span>
+								</div>
+								{prediction.points !== null && (
+									<div className='text-xs text-muted-foreground mt-1'>
+										Points earned: {prediction.points}
+									</div>
+								)}
+							</div>
+						)}
+
+						{/* Action Button */}
+						<div className='flex justify-center'>
+							{canPredict ? (
+								<Button
+									onClick={() => openPredictionDialog(match)}
+									size='sm'
+									className='btn-animate'>
+									{prediction ? 'Update Prediction' : 'Make Prediction'}
+								</Button>
+							) : (
+								<Button variant='outline' size='sm' disabled>
+									{match.status === MatchStatus.FINISHED
+										? 'Match Finished'
+										: 'Predictions Locked'}
+								</Button>
 							)}
 						</div>
-					)}
-
-					{/* Action Button */}
-					<div className='space-y-2'>
-						{!prediction && canPredict && (
-							<Button
-								className='w-full'
-								onClick={() => openPredictionDialog(match)}>
-								Make Prediction
-							</Button>
-						)}
-
-						{prediction && canPredict && (
-							<Button
-								variant='outline'
-								className='w-full'
-								onClick={() => openPredictionDialog(match)}>
-								Edit Prediction
-							</Button>
-						)}
-
-						{!canPredict && !prediction && (
-							<Button variant='secondary' className='w-full' disabled>
-								Predictions Locked
-							</Button>
-						)}
 					</div>
 				</CardContent>
 			</Card>
 		);
 	};
 
-	if (isLoading) {
-		return (
-			<div className='container mx-auto px-4 py-8'>
-				<div className='text-center'>Loading dashboard...</div>
-			</div>
-		);
-	}
-
-	const totalMatches = matches.length + mockMatches.length;
-	const liveMatchesCount = liveMatches.length;
-	const finishedMatchesCount = finishedMatches.length;
-	const totalPoints = userPredictions.reduce((sum, p) => sum + p.points, 0);
-
 	return (
-		<div className='container mx-auto px-4 py-8'>
-			<div className='mb-8'>
-				<h1 className='text-3xl font-bold mb-2'>Dashboard</h1>
-				<p className='text-gray-600'>
-					Welcome back, {user?.name}! Track matches and manage your predictions.
-				</p>
-			</div>
+		<div className='min-h-screen bg-background'>
+			{/* Hero Section */}
+			<div className='eltek-gradient border-b border-border'>
+				<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+					<div className='text-center'>
+						<h1 className='text-4xl font-bold text-foreground mb-4'>
+							Welcome back, {user.name}!
+						</h1>
+						<p className='text-xl text-muted-foreground mb-8'>
+							Track your predictions and compete with your colleagues
+						</p>
 
-			{/* Statistics Cards */}
-			<div className='grid grid-cols-1 md:grid-cols-4 gap-4 mb-8'>
-				<Card>
-					<CardContent className='p-4'>
-						<div className='text-2xl font-bold text-blue-600'>
-							{totalPoints}
-						</div>
-						<div className='text-sm text-gray-500'>Your Points</div>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardContent className='p-4'>
-						<div className='text-2xl font-bold'>{userPredictions.length}</div>
-						<div className='text-sm text-gray-500'>Predictions Made</div>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardContent className='p-4'>
-						<div className='text-2xl font-bold text-green-600'>
-							{liveMatchesCount}
-						</div>
-						<div className='text-sm text-gray-500'>Live Matches</div>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardContent className='p-4'>
-						<div className='text-2xl font-bold'>{finishedMatchesCount}</div>
-						<div className='text-sm text-gray-500'>Finished Matches</div>
-					</CardContent>
-				</Card>
-			</div>
-
-			<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-				{/* Matches Section */}
-				<div className='lg:col-span-2'>
-					<div className='flex items-center justify-between mb-4'>
-						<h2 className='text-2xl font-bold'>Matches</h2>
-						<div className='space-x-2'>
-							<Link href='/predictions'>
-								<Button variant='outline' size='sm'>
-									View All Predictions
-								</Button>
-							</Link>
+						{/* Quick Stats */}
+						<div className='grid grid-cols-1 md:grid-cols-3 gap-6 max-w-2xl mx-auto'>
+							<div className='bg-card rounded-xl p-4 shadow-sm border border-border'>
+								<div className='text-2xl font-bold text-primary'>
+									{userPredictions.length}
+								</div>
+								<div className='text-sm text-muted-foreground'>
+									Predictions Made
+								</div>
+							</div>
+							<div className='bg-card rounded-xl p-4 shadow-sm border border-border'>
+								<div className='text-2xl font-bold text-primary'>
+									{liveMatches.length}
+								</div>
+								<div className='text-sm text-muted-foreground'>
+									Live Matches
+								</div>
+							</div>
+							<div className='bg-card rounded-xl p-4 shadow-sm border border-border'>
+								<div className='text-2xl font-bold text-primary'>
+									{upcomingMatches.length}
+								</div>
+								<div className='text-sm text-muted-foreground'>
+									Upcoming Matches
+								</div>
+							</div>
 						</div>
 					</div>
-
-					{totalMatches === 0 ? (
-						<Card>
-							<CardContent className='p-8 text-center'>
-								<div className='text-gray-500'>No matches available</div>
-							</CardContent>
-						</Card>
-					) : (
-						<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-							{/* Database Matches */}
-							{matches
-								.slice(0, 4)
-								.map((match) => renderMatchCard(match, 'database'))}
-
-							{/* Mock Matches (if we need more to fill the grid) */}
-							{matches.length < 4 &&
-								mockMatches
-									.slice(0, 4 - matches.length)
-									.map((match) => renderMatchCard(match, 'mock'))}
-						</div>
-					)}
 				</div>
+			</div>
 
-				{/* Leaderboard Section */}
-				<div>
-					<div className='flex items-center justify-between mb-4'>
-						<h2 className='text-2xl font-bold'>Leaderboard</h2>
-						<Link href='/leaderboard'>
-							<Button variant='outline' size='sm'>
-								View Full
-							</Button>
-						</Link>
+			{/* Main Content */}
+			<div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
+				{/* Tab Navigation */}
+				<div className='flex items-center justify-center mb-8'>
+					<div className='bg-muted p-1 rounded-lg'>
+						<Button
+							variant={activeTab === 'database' ? 'default' : 'ghost'}
+							size='sm'
+							onClick={() => setActiveTab('database')}
+							className='btn-animate'>
+							Database Matches
+						</Button>
+						<Button
+							variant={activeTab === 'mock' ? 'default' : 'ghost'}
+							size='sm'
+							onClick={() => setActiveTab('mock')}
+							className='btn-animate'>
+							Mock Matches
+						</Button>
 					</div>
-
-					<Leaderboard showUserRank={true} limit={5} />
 				</div>
+
+				{isLoading ? (
+					<div className='text-center py-12'>
+						<div className='animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4'></div>
+						<p className='text-muted-foreground'>Loading matches...</p>
+					</div>
+				) : (
+					<div className='space-y-8'>
+						{/* Live Matches */}
+						{liveMatches.length > 0 && (
+							<section>
+								<h2 className='text-2xl font-semibold text-foreground mb-4 flex items-center'>
+									🔴 Live Matches
+									<Badge className='ml-2 bg-red-500 animate-pulse text-white'>
+										{liveMatches.length}
+									</Badge>
+								</h2>
+								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+									{liveMatches.map((match) =>
+										renderMatchCard(match, activeTab)
+									)}
+								</div>
+							</section>
+						)}
+
+						{/* Upcoming Matches */}
+						{upcomingMatches.length > 0 && (
+							<section>
+								<h2 className='text-2xl font-semibold text-foreground mb-4 flex items-center'>
+									⏰ Upcoming Matches
+									<Badge variant='outline' className='ml-2'>
+										{upcomingMatches.length}
+									</Badge>
+								</h2>
+								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+									{upcomingMatches.map((match) =>
+										renderMatchCard(match, activeTab)
+									)}
+								</div>
+							</section>
+						)}
+
+						{/* Finished Matches */}
+						{finishedMatches.length > 0 && (
+							<section>
+								<h2 className='text-2xl font-semibold text-foreground mb-4 flex items-center'>
+									✅ Finished Matches
+									<Badge variant='secondary' className='ml-2'>
+										{finishedMatches.length}
+									</Badge>
+								</h2>
+								<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+									{finishedMatches
+										.slice(0, 6)
+										.map((match) => renderMatchCard(match, activeTab))}
+								</div>
+								{finishedMatches.length > 6 && (
+									<div className='text-center mt-6'>
+										<Link href='/predictions'>
+											<Button variant='outline' className='btn-animate'>
+												View All Matches
+											</Button>
+										</Link>
+									</div>
+								)}
+							</section>
+						)}
+
+						{/* Empty State */}
+						{currentMatches.length === 0 && (
+							<div className='text-center py-12'>
+								<div className='text-6xl mb-4'>⚽</div>
+								<h3 className='text-xl font-semibold text-foreground mb-2'>
+									No matches available
+								</h3>
+								<p className='text-muted-foreground'>
+									Check back later for upcoming matches
+								</p>
+							</div>
+						)}
+
+						{/* Quick Actions */}
+						<div className='bg-muted/30 rounded-xl p-8 text-center'>
+							<h3 className='text-xl font-semibold text-foreground mb-4'>
+								Quick Actions
+							</h3>
+							<div className='flex flex-col sm:flex-row gap-4 justify-center'>
+								<Link href='/predictions'>
+									<Button className='btn-animate'>View All Predictions</Button>
+								</Link>
+								<Link href='/leaderboard'>
+									<Button variant='outline' className='btn-animate'>
+										Check Leaderboard
+									</Button>
+								</Link>
+							</div>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Prediction Dialog */}
@@ -382,7 +451,7 @@ export default function DashboardPage() {
 					{selectedMatch && (
 						<PredictionForm
 							match={selectedMatch}
-							existingPrediction={selectedPrediction || undefined}
+							existingPrediction={selectedPrediction}
 							onSuccess={handlePredictionSuccess}
 							onCancel={() => setIsDialogOpen(false)}
 						/>
