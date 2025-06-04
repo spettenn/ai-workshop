@@ -6,125 +6,239 @@ Deliver a working internal web app that lets employees predict match scores, see
 
 ## 2. Constraints & Assumptions
 
-- **Time-box:** 1 working day (≈ 8 h coding + breaks).
-- **Team:** 1 developer + ChatGPT (pair-programming).
-- **Environment:** Node 18, PNPM, VS Code, Docker (optional), Python 3.11 for quick scripts.
-- **Users:** ≤ 100 concurrent (office pool).
-- **Tournament Data:** FIFA World Cup 2026 group stage sample; live data via API-Football.
+- **Time-box:** 1 working day (≈ 5 h coding + breaks).
+- **Team:** 3 developers + AI assistance (pair-programming).
+- **Environment:** Node 18+, npm, VS Code, Local PostgreSQL.
+- **Users:** ≤ 100 concurrent (office pool).
+- **Tournament Data:** FIFA World Cup 2026 group stage sample; mock data for local development.
 
-## 3. Recommended Tech Stack
+## 3. Final Tech Stack (Updated)
 
-| Layer             | Choice                                              | Rationale                                       |
-| ----------------- | --------------------------------------------------- | ----------------------------------------------- |
-| **Frontend**      | next.js + Vite, TypeScript, Tailwind CSS, shadcn/ui | Fast scaffold, minimal config, ready components |
-| **Realtime**      | Socket.io client                                    | Push live scores & leaderboard                  |
-| **Backend**       | Express + TypeScript, Socket.io server              | Familiar, quick, integrates with React          |
-| **DB**            | PostgreSQL (Supabase or Docker) using Prisma ORM    | Simple relational schema, migrations            |
-| **Auth**          | JWT w/ bcrypt or Supabase Auth                      | Lightweight                                     |
-| **Data Provider** | API-Football (HTTP + optional websockets)           | Free tier adequate                              |
-| **Deployment**    | Vercel (frontend) + Railway/Fly.io (backend + DB)   | 1-click, free hobby tier                        |
+| Layer             | Choice                                               | Rationale                                       |
+| ----------------- | ---------------------------------------------------- | ----------------------------------------------- |
+| **Frontend**      | Vite + next.js + TypeScript, Tailwind CSS, shadcn/ui | Fast scaffold, minimal config, ready components |
+| **Realtime**      | Socket.io client                                     | Push live scores & leaderboard                  |
+| **Backend**       | Express + TypeScript, Socket.io server               | Familiar, quick, integrates with React          |
+| **DB**            | PostgreSQL (Local) using Prisma ORM                  | Simple relational schema, migrations            |
+| **Auth**          | JWT w/ bcrypt (Supabase-ready)                       | Lightweight, scalable                           |
+| **Data Provider** | Mock data (API-Football ready)                       | Fast development, easy to switch                |
+| **Deployment**    | Local development only                               | Workshop focus                                  |
 
-## 4. Repository & File Structure
+## 4. Actual Repository Structure (Implemented)
 
 ```
 / (git root)
-├─ client/             # React app
+├─ client/             # React app (Segment 4)
 │  ├─ src/
 │  │  ├─ components/   # MatchCard, LeaderboardTable, ...
 │  │  ├─ pages/        # Login, Dashboard, Matches, Leaderboard
 │  │  └─ hooks/
 │  └─ vite.config.ts
-├─ server/
+├─ server/             # ✅ COMPLETED
 │  ├─ src/
-│  │  ├─ api/          # REST routes
-│  │  ├─ prisma/       # Generated types
-│  │  ├─ jobs/         # Cron & webhook handlers
-│  │  └─ index.ts
-│  └─ Dockerfile
-├─ prisma/
-│  └─ schema.prisma
-└─ .env.example
+│  │  ├─ routes/       # ✅ auth.ts (register, login, me)
+│  │  ├─ middleware/   # ✅ auth.ts (JWT authentication)
+│  │  ├─ utils/        # ✅ jwt.ts (token generation/verification)
+│  │  ├─ types/        # ✅ auth.ts (TypeScript interfaces)
+│  │  └─ index.ts      # ✅ Express + Socket.io server
+│  ├─ prisma/          # ✅ COMPLETED
+│  │  ├─ schema.prisma # ✅ User, Match, Prediction, Comment models
+│  │  └─ seed.ts       # ✅ Mock data seeding
+│  ├─ package.json     # ✅ Dependencies installed
+│  └─ tsconfig.json    # ✅ TypeScript configuration
+├─ package.json        # ✅ Monorepo workspace setup
+├─ README.md           # ✅ Complete setup instructions
+├─ .gitignore          # ✅ Comprehensive ignore rules
+└─ env.example         # ✅ Environment template
 ```
 
-## 5. Environment Variables (server/.env)
+## 5. Environment Variables (server/.env) ✅ CONFIGURED
 
 ```
-DATABASE_URL=postgres://...
-JWT_SECRET=changeme
-FOOTBALL_API_KEY=...
-CLIENT_ORIGIN=http://localhost:5173
+DATABASE_URL="postgresql://aleksanderspetalen@localhost:5432/soccer_betting_db"
+JWT_SECRET="super-secret-jwt-key-for-workshop-2024"
+PORT=3001
+NODE_ENV=development
+CLIENT_ORIGIN="http://localhost:5173"
+FOOTBALL_API_KEY="your-api-football-key-here"
+FOOTBALL_API_URL="https://v3.football.api-sports.io"
 ```
 
-## 6. Pre-flight Setup (30 min)
+## 6. Implementation Progress - Segmented Approach
 
-1. Create Git repo & branches (`main`, `dev`).
-2. Grab API-Football key & add to `.env`.
-3. Install global tools: pnpm, prisma, vercel CLI.
-4. Draft DB schema on paper / whiteboard.
+### ✅ **Segment 1: Project Structure & Database** (COMPLETED)
 
-## 7. Eight-Hour Implementation Timeline
+- [x] **Initialize monorepo structure** - Root package.json with workspaces
+- [x] **Create Prisma schema** - User, Match, Prediction, Comment models
+- [x] **Environment configuration** - Local PostgreSQL setup
+- [x] **Install dependencies** - Express, Prisma, JWT, bcrypt, Socket.io
+- [x] **Database setup** - PostgreSQL running, tables created, seeded with mock data
 
-| Time        | Goal                         | Tasks                                                                                                                  | Example AI Prompts                                                                                                                                                 |
-| ----------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 09:00-09:30 | **Bootstrapping**            | `pnpm create vite@latest client --template react-ts` · `pnpm create @express-ts/server` · Initialize TSconfig & ESLint | “Generate an Express server entry point with TypeScript and Socket.io set up.”                                                                                     |
-| 09:30-10:30 | **DB & Auth**                | Write `schema.prisma` (User, Match, Prediction) · `prisma migrate dev` · Auth routes (`/register`, `/login`)           | “Create a Prisma schema with User (email, name, dept), Match (id, utcKickoff, home, away, score), Prediction (pk, userId, matchId, homeGoals, awayGoals, points).” |
-| 10:30-11:30 | **Match Data Sync**          | Write `syncMatches.ts` to fetch fixtures + webhook receiver for live scores · Store in DB                              | “Write a cron script that pulls today’s World Cup fixtures from API-Football and upserts them via Prisma.”                                                         |
-| 11:30-12:30 | **Frontend Scaffold**        | Tailwind + shadcn/ui init · Auth pages · Protected `Dashboard` layout                                                  | “Generate a React login page that calls /login and stores JWT in localStorage.”                                                                                    |
-| 13:00-14:00 | **Prediction UI**            | `MatchCard` with countdown, score inputs (disabled after kickoff)                                                      | “Create a React component that shows match info, a countdown hook, and two numeric inputs locked after startTime.”                                                 |
-| 14:00-15:00 | **Scoring & Leaderboard**    | Server job: compute points after `match.status === "FT"` · `/leaderboard` endpoint · LeaderboardTable component        | “Implement a TypeScript function that returns 3/2/1 points based on predicted vs actual scores.”                                                                   |
-| 15:00-16:00 | **Realtime & Notifications** | Emit `leaderboard:update` & `match:score` events · Frontend Socket context                                             | “Add Socket.io client to React that listens for leaderboard updates and triggers a toast.”                                                                         |
-| 16:00-17:00 | **Social Features**          | `/comments/:matchId` REST + Socket room · CommentSection component                                                     | “Generate a Prisma model and Express routes for threaded comments scoped by match.”                                                                                |
-| 17:00-18:00 | **Testing + Deploy**         | Jest unit tests (scoring) · Supertest API smoke · `vercel --prod` & Railway deploy · Seed demo data                    | “Write Supertest cases for the /login and /predict endpoints.”                                                                                                     |
+**✅ Test Results:**
 
-> **Buffer:** 30 min unused slots cover troubleshooting / polish.
+- Database: 4 tables created (users, matches, predictions, comments)
+- Mock data: 3 demo users, 5 World Cup matches, sample predictions
+- Commands working: `npm run db:generate`, `npm run db:migrate`, `npm run db:seed`
 
-## 8. Prompt Cheat-Sheet (Copy/Paste)
+### ✅ **Segment 2: User Authentication** (COMPLETED)
 
-- **DB Schema**: “Design a Prisma schema for …”
-- **Auth Middleware**: “Express JWT middleware that rejects if token invalid or expired.”
-- **Socket Setup**: “Add Socket.io to an existing Express + TS project with CORS enabled.”
-- **React Countdown**: “React hook returning minutes:seconds until a UTC timestamp.”
-- **Leaderboard Query**: “Prisma query that ranks users by SUM(points) DESC.”
+- [x] **User model & registration** - Complete user registration with validation
+- [x] **JWT token generation/verification** - 7-day tokens, secure verification
+- [x] **Basic auth routes** - `/register`, `/login`, `/me` endpoints
+- [x] **Authentication middleware** - Protected routes, token validation
+- [x] **Security features** - Password hashing, input validation, CORS
 
-## 9. Stretch Goals (if time permits)
+**✅ Test Results:**
 
-- Department filter on leaderboard (Prisma `groupBy`).
-- Email reminders (nodemailer + cron).
-- Dark mode toggle via Tailwind.
+- Server running on http://localhost:3001
+- Registration: Creates user + returns JWT token
+- Login: Validates credentials + returns JWT token
+- Protected routes: Requires valid Bearer token
+- Database integration: New users saved to PostgreSQL
 
-## 10. Demo & Handover Checklist
+**🔗 API Endpoints Working:**
 
-- [ ] Register 3 demo users.
-- [ ] Seed 3 upcoming matches.
-- [ ] Record a prediction flow & live update in Loom.
-- [ ] Push final repo to GitHub + README with setup steps.
+```bash
+POST /api/auth/register  # Register new user
+POST /api/auth/login     # Login user
+GET  /api/auth/me        # Get current user (protected)
+GET  /health             # Server health check
+```
 
-Hello sir, we have outlined a project we want to start on today. we are a group of 3 people who want to make something cool. please look at the .md. we want to start using JWT tokens, but want to make the app scalable for future use of superbase for example. is there any easy way to mock the databse in the local enviorment so it is as close to production as possible. this assigment is part of a 1 day workshop we intend to have mvp within 5 hours. dont start with the implementation, but continue on the @ai_workshop_mvp.md project structure. we want to implement this project in segments so we want small incrementations for future tasks.
+### 🔄 **Segment 3: Match Management** (NEXT)
 
-important to know: we are only working locally today so the auth and backend integration is not important. we just want to get the project structure and mock database setup.
+- [ ] **Match CRUD endpoints** - Create, read, update, delete matches
+- [ ] **Match status management** - SCHEDULED, LIVE, FINISHED states
+- [ ] **Mock match data service** - Simulate API-Football responses
+- [ ] **Match filtering & querying** - By status, date, round
+- [ ] **Real-time match updates** - Socket.io events for score changes
 
-segment 1:
+**📋 Planned Endpoints:**
 
-- [ ] Initialize monorepo structure
-- [ ] Create Prisma schema (mock data)
-- [ ] Environment configuratio (if needed)
-- [ ]install dependencies
+```bash
+GET    /api/matches           # List all matches
+GET    /api/matches/:id       # Get specific match
+POST   /api/matches           # Create match (admin)
+PUT    /api/matches/:id       # Update match scores
+DELETE /api/matches/:id       # Delete match (admin)
+```
 
-segment 2:
+### 🔄 **Segment 4: Frontend Setup** (AFTER SEGMENT 3)
 
-- [ ] User model & registration
-- [ ] JWT token generation/verification
-- [ ] Basic auth routes (/register, /login)
+- [ ] **Vite + React + TypeScript setup** - Modern build tooling
+- [ ] **Tailwind + shadcn/ui configuration** - Styling framework
+- [ ] **Auth context & protected routes** - Client-side authentication
+- [ ] **Login/register pages** - User interface for authentication
+- [ ] **Match display components** - Show matches and predictions
 
-segment 3:
+### 🔄 **Segment 5: Prediction System** (FUTURE)
 
-- [ ] Match model in Prisma
-- [ ] API-Football integration (or just use mock data for now)
-- [ ] Basic match CRUD endpoints
+- [ ] **Prediction CRUD endpoints** - Submit and manage predictions
+- [ ] **Points calculation system** - Scoring algorithm implementation
+- [ ] **Leaderboard generation** - Rank users by points
+- [ ] **Prediction deadlines** - Lock predictions before kickoff
 
-segment 4:
+### 🔄 **Segment 6: Real-time Features** (FUTURE)
 
-- [ ] Vite + next + TypeScript setup
-- [ ] Tailwind + shadcn/ui configuration
-- [ ] Auth context & protected routes (local)
-- [ ] Login/register pages (local)
+- [ ] **Socket.io integration** - Live score updates
+- [ ] **Real-time leaderboard** - Live ranking updates
+- [ ] **Match comments system** - Social interaction features
+
+## 7. Development Commands (Working)
+
+```bash
+# Database Management ✅
+npm run db:generate    # Generate Prisma client
+npm run db:migrate     # Run migrations
+npm run db:seed        # Seed with mock data
+npm run db:studio      # Open Prisma Studio
+
+# Development ✅
+npm run dev:server     # Start backend server (port 3001)
+npm run dev:client     # Start frontend (when ready)
+npm run dev           # Start both simultaneously
+
+# Build
+npm run build         # Build both
+npm run build:server  # Server only
+npm run build:client  # Client only
+```
+
+## 8. Database Schema (Implemented)
+
+### Users ✅
+
+```sql
+- id (String, CUID)
+- email (String, unique)
+- name (String)
+- department (String, optional)
+- password (String, bcrypt hashed)
+- createdAt, updatedAt (DateTime)
+```
+
+### Matches ✅
+
+```sql
+- id (String, CUID)
+- apiId (Int, optional, unique)
+- homeTeam, awayTeam (String)
+- kickoffTime (DateTime)
+- status (String: SCHEDULED, LIVE, FINISHED)
+- homeScore, awayScore (Int, optional)
+- round, venue (String, optional)
+- createdAt, updatedAt (DateTime)
+```
+
+### Predictions ✅
+
+```sql
+- id (String, CUID)
+- userId, matchId (String, foreign keys)
+- homeGoals, awayGoals (Int)
+- points (Int, default 0)
+- createdAt, updatedAt (DateTime)
+- Unique constraint: (userId, matchId)
+```
+
+### Comments ✅
+
+```sql
+- id (String, CUID)
+- content (String)
+- userId, matchId (String, foreign keys)
+- createdAt, updatedAt (DateTime)
+```
+
+## 9. Supabase Migration Path (Future)
+
+The current setup is designed for easy migration:
+
+1. **Database**: Prisma schema is PostgreSQL-compatible ✅
+2. **Auth**: JWT structure matches Supabase auth ✅
+3. **Real-time**: Socket.io can be replaced with Supabase real-time
+4. **Storage**: Ready for Supabase storage integration
+
+## 10. Next Steps
+
+**Immediate (Segment 3):**
+
+- Implement match management endpoints
+- Add match status transitions
+- Create mock data service for matches
+- Test match CRUD operations
+
+**After Segment 3:**
+
+- Frontend React application
+- Authentication UI components
+- Match display and prediction forms
+- Real-time updates integration
+
+---
+
+**🎯 Current Status:** Segments 1 & 2 complete, ready for Segment 3
+**⏱️ Time Spent:** ~2 hours (Database + Auth)
+**🚀 Next Goal:** Match Management System
+
+Built with ❤️ during AI Workshop 2024
