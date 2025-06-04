@@ -16,7 +16,7 @@ Deliver a working internal web app that lets employees predict match scores, see
 
 | Layer             | Choice                                               | Rationale                                       |
 | ----------------- | ---------------------------------------------------- | ----------------------------------------------- |
-| **Frontend**      | Vite + next.js + TypeScript, Tailwind CSS, shadcn/ui | Fast scaffold, minimal config, ready components |
+| **Frontend**      | Vite + Next.js + TypeScript, Tailwind CSS, shadcn/ui | Fast scaffold, minimal config, ready components |
 | **Realtime**      | Socket.io client                                     | Push live scores & leaderboard                  |
 | **Backend**       | Express + TypeScript, Socket.io server               | Familiar, quick, integrates with React          |
 | **DB**            | PostgreSQL (Local) using Prisma ORM                  | Simple relational schema, migrations            |
@@ -28,18 +28,18 @@ Deliver a working internal web app that lets employees predict match scores, see
 
 ```
 / (git root)
-├─ client/             # React app (Segment 4)
+├─ client/             # Next.js app (Segment 4)
 │  ├─ src/
 │  │  ├─ components/   # MatchCard, LeaderboardTable, ...
 │  │  ├─ pages/        # Login, Dashboard, Matches, Leaderboard
 │  │  └─ hooks/
-│  └─ vite.config.ts
+│  └─ next.config.js
 ├─ server/             # ✅ COMPLETED
 │  ├─ src/
-│  │  ├─ routes/       # ✅ auth.ts (register, login, me)
+│  │  ├─ routes/       # ✅ auth.ts, matches.ts (CRUD endpoints)
 │  │  ├─ middleware/   # ✅ auth.ts (JWT authentication)
-│  │  ├─ utils/        # ✅ jwt.ts (token generation/verification)
-│  │  ├─ types/        # ✅ auth.ts (TypeScript interfaces)
+│  │  ├─ utils/        # ✅ jwt.ts, mockData.ts, liveUpdates.ts
+│  │  ├─ types/        # ✅ auth.ts, match.ts (TypeScript interfaces)
 │  │  └─ index.ts      # ✅ Express + Socket.io server
 │  ├─ prisma/          # ✅ COMPLETED
 │  │  ├─ schema.prisma # ✅ User, Match, Prediction, Comment models
@@ -59,7 +59,7 @@ DATABASE_URL="postgresql://aleksanderspetalen@localhost:5432/soccer_betting_db"
 JWT_SECRET="super-secret-jwt-key-for-workshop-2024"
 PORT=3001
 NODE_ENV=development
-CLIENT_ORIGIN="http://localhost:5173"
+CLIENT_ORIGIN="http://localhost:3000"
 FOOTBALL_API_KEY="your-api-football-key-here"
 FOOTBALL_API_URL="https://v3.football.api-sports.io"
 ```
@@ -105,31 +105,62 @@ GET  /api/auth/me        # Get current user (protected)
 GET  /health             # Server health check
 ```
 
-### 🔄 **Segment 3: Match Management** (NEXT)
+### ✅ **Segment 3: Match Management** (COMPLETED)
 
-- [ ] **Match CRUD endpoints** - Create, read, update, delete matches
-- [ ] **Match status management** - SCHEDULED, LIVE, FINISHED states
-- [ ] **Mock match data service** - Simulate API-Football responses
-- [ ] **Match filtering & querying** - By status, date, round
-- [ ] **Real-time match updates** - Socket.io events for score changes
+- [x] **Match CRUD endpoints** - Create, read, update, delete matches
+- [x] **Match status management** - SCHEDULED, LIVE, FINISHED states
+- [x] **Mock match data service** - Simulate API-Football responses
+- [x] **Match filtering & querying** - By status, date, round, team name
+- [x] **Real-time match updates** - Socket.io events for score changes
+- [x] **Live score simulation** - Automatic updates for local development
 
-**📋 Planned Endpoints:**
+**✅ Test Results:**
+
+- Database matches: 6 matches (5 seeded + 1 created via API)
+- Mock matches: 8 additional World Cup fixtures for local development
+- Filtering: Status, round, team name, date range filtering works
+- Pagination: Page/limit parameters working correctly
+- Protected routes: JWT authentication required for CUD operations
+- Real-time events: Socket.io match updates working
+- API simulation: API-Football response structure implemented
+
+**🔗 Match API Endpoints Working:**
 
 ```bash
-GET    /api/matches           # List all matches
-GET    /api/matches/:id       # Get specific match
-POST   /api/matches           # Create match (admin)
-PUT    /api/matches/:id       # Update match scores
-DELETE /api/matches/:id       # Delete match (admin)
+# Public endpoints
+GET    /api/matches              # Database matches with filtering
+GET    /api/matches/mock         # Mock matches for local dev
+GET    /api/matches/:id          # Specific match (DB + mock fallback)
+GET    /api/matches/api-football/simulate  # API-Football simulation
+
+# Protected endpoints (require JWT)
+POST   /api/matches              # Create new match
+PUT    /api/matches/:id          # Update match scores/status
+DELETE /api/matches/:id          # Delete match
 ```
 
-### 🔄 **Segment 4: Frontend Setup** (AFTER SEGMENT 3)
+### 🔄 **Segment 4: Frontend Setup** (NEXT)
 
-- [ ] **Vite + React + TypeScript setup** - Modern build tooling
-- [ ] **Tailwind + shadcn/ui configuration** - Styling framework
+- [ ] **Next.js + TypeScript setup** - Modern React framework with SSR
+- [ ] **Tailwind + shadcn/ui configuration** - Styling framework + component library
+- [ ] **Install shadcn/ui components** - Button, Card, Input, Form, Dialog, Toast
 - [ ] **Auth context & protected routes** - Client-side authentication
 - [ ] **Login/register pages** - User interface for authentication
 - [ ] **Match display components** - Show matches and predictions
+
+**📋 Planned Components:**
+
+```bash
+# shadcn/ui components to install
+npx shadcn-ui@latest add button
+npx shadcn-ui@latest add card
+npx shadcn-ui@latest add input
+npx shadcn-ui@latest add form
+npx shadcn-ui@latest add dialog
+npx shadcn-ui@latest add toast
+npx shadcn-ui@latest add table
+npx shadcn-ui@latest add badge
+```
 
 ### 🔄 **Segment 5: Prediction System** (FUTURE)
 
@@ -221,24 +252,25 @@ The current setup is designed for easy migration:
 
 ## 10. Next Steps
 
-**Immediate (Segment 3):**
+**Immediate (Segment 4):**
 
-- Implement match management endpoints
-- Add match status transitions
-- Create mock data service for matches
-- Test match CRUD operations
+- Set up Next.js with TypeScript and Tailwind CSS
+- Install and configure shadcn/ui component library
+- Create authentication context and protected routes
+- Build login/register pages with form validation
+- Implement match display components
 
-**After Segment 3:**
+**After Segment 4:**
 
-- Frontend React application
-- Authentication UI components
-- Match display and prediction forms
+- Prediction submission system
+- Points calculation and leaderboard
 - Real-time updates integration
+- Social features (comments)
 
 ---
 
-**🎯 Current Status:** Segments 1 & 2 complete, ready for Segment 3
-**⏱️ Time Spent:** ~2 hours (Database + Auth)
-**🚀 Next Goal:** Match Management System
+**🎯 Current Status:** Segments 1, 2 & 3 complete, ready for Segment 4
+**⏱️ Time Spent:** ~3 hours (Database + Auth + Match Management)
+**🚀 Next Goal:** Next.js Frontend with shadcn/ui
 
 Built with ❤️ during AI Workshop 2024

@@ -8,6 +8,7 @@ import { Server as SocketIOServer } from 'socket.io';
 
 // Import routes
 import authRoutes from './routes/auth';
+import matchRoutes from './routes/matches';
 
 // Load environment variables
 dotenv.config();
@@ -46,6 +47,7 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/matches', matchRoutes);
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
@@ -101,6 +103,7 @@ server.listen(PORT, () => {
 	console.log(`🚀 Server running on port ${PORT}`);
 	console.log(`📊 Health check: http://localhost:${PORT}/health`);
 	console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
+	console.log(`⚽ Match endpoints: http://localhost:${PORT}/api/matches`);
 	console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
