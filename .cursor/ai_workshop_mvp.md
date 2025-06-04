@@ -14,15 +14,15 @@ Deliver a working internal web app that lets employees predict match scores, see
 
 ## 3. Recommended Tech Stack
 
-| Layer             | Choice                                            | Rationale                                       |
-| ----------------- | ------------------------------------------------ | ----------------------------------------------- |
-| **Frontend**      | React + Vite, TypeScript, Tailwind CSS, shadcn/ui | Fast scaffold, minimal config, ready components |
-| **Realtime**      | Socket.io client                                  | Push live scores & leaderboard                  |
-| **Backend**       | Express + TypeScript, Socket.io server            | Familiar, quick, integrates with React          |
-| **DB**            | PostgreSQL (Supabase or Docker) using Prisma ORM  | Simple relational schema, migrations            |
-| **Auth**          | JWT w/ bcrypt or Supabase Auth                    | Lightweight                                     |
-| **Data Provider** | API-Football (HTTP + optional websockets)         | Free tier adequate                              |
-| **Deployment**    | Vercel (frontend) + Railway/Fly.io (backend + DB) | 1-click, free hobby tier                        |
+| Layer             | Choice                                              | Rationale                                       |
+| ----------------- | --------------------------------------------------- | ----------------------------------------------- |
+| **Frontend**      | next.js + Vite, TypeScript, Tailwind CSS, shadcn/ui | Fast scaffold, minimal config, ready components |
+| **Realtime**      | Socket.io client                                    | Push live scores & leaderboard                  |
+| **Backend**       | Express + TypeScript, Socket.io server              | Familiar, quick, integrates with React          |
+| **DB**            | PostgreSQL (Supabase or Docker) using Prisma ORM    | Simple relational schema, migrations            |
+| **Auth**          | JWT w/ bcrypt or Supabase Auth                      | Lightweight                                     |
+| **Data Provider** | API-Football (HTTP + optional websockets)           | Free tier adequate                              |
+| **Deployment**    | Vercel (frontend) + Railway/Fly.io (backend + DB)   | 1-click, free hobby tier                        |
 
 ## 4. Repository & File Structure
 
@@ -98,3 +98,33 @@ CLIENT_ORIGIN=http://localhost:5173
 - [ ] Seed 3 upcoming matches.
 - [ ] Record a prediction flow & live update in Loom.
 - [ ] Push final repo to GitHub + README with setup steps.
+
+Hello sir, we have outlined a project we want to start on today. we are a group of 3 people who want to make something cool. please look at the .md. we want to start using JWT tokens, but want to make the app scalable for future use of superbase for example. is there any easy way to mock the databse in the local enviorment so it is as close to production as possible. this assigment is part of a 1 day workshop we intend to have mvp within 5 hours. dont start with the implementation, but continue on the @ai_workshop_mvp.md project structure. we want to implement this project in segments so we want small incrementations for future tasks.
+
+important to know: we are only working locally today so the auth and backend integration is not important. we just want to get the project structure and mock database setup.
+
+segment 1:
+
+- [ ] Initialize monorepo structure
+- [ ] Create Prisma schema (mock data)
+- [ ] Environment configuratio (if needed)
+- [ ]install dependencies
+
+segment 2:
+
+- [ ] User model & registration
+- [ ] JWT token generation/verification
+- [ ] Basic auth routes (/register, /login)
+
+segment 3:
+
+- [ ] Match model in Prisma
+- [ ] API-Football integration (or just use mock data for now)
+- [ ] Basic match CRUD endpoints
+
+segment 4:
+
+- [ ] Vite + next + TypeScript setup
+- [ ] Tailwind + shadcn/ui configuration
+- [ ] Auth context & protected routes (local)
+- [ ] Login/register pages (local)
