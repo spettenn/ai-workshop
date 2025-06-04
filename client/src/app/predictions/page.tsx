@@ -321,6 +321,11 @@ export default function PredictionsPage() {
 			{/* Prediction Dialog */}
 			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 				<DialogContent className='max-w-md'>
+					<DialogHeader>
+						<DialogTitle>
+							{selectedPrediction ? 'Edit Prediction' : 'Make Prediction'}
+						</DialogTitle>
+					</DialogHeader>
 					{selectedMatch && (
 						<PredictionForm
 							match={selectedMatch}

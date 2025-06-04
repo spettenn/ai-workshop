@@ -189,7 +189,7 @@ router.get(
 			const limit = filters.limit || 10;
 			const skip = (page - 1) * limit;
 
-			const where = { userId: req.user!.id };
+			const where = { userId: req.user!.userId };
 
 			if (filters.matchId) {
 				where.matchId = filters.matchId;
@@ -287,7 +287,7 @@ router.post(
 			const existingPrediction = await prisma.prediction.findUnique({
 				where: {
 					userId_matchId: {
-						userId: req.user!.id,
+						userId: req.user!.userId,
 						matchId: validatedData.matchId,
 					},
 				},
@@ -303,7 +303,7 @@ router.post(
 			// Create prediction
 			const prediction = await prisma.prediction.create({
 				data: {
-					userId: req.user!.id,
+					userId: req.user!.userId,
 					matchId: validatedData.matchId,
 					homeGoals: validatedData.homeGoals,
 					awayGoals: validatedData.awayGoals,
@@ -385,7 +385,7 @@ router.put(
 			}
 
 			// Check if user owns this prediction
-			if (prediction.userId !== req.user!.id) {
+			if (prediction.userId !== req.user!.userId) {
 				res.status(403).json({
 					error: 'Not authorized to update this prediction',
 				});
@@ -482,7 +482,7 @@ router.delete(
 			}
 
 			// Check if user owns this prediction
-			if (prediction.userId !== req.user!.id) {
+			if (prediction.userId !== req.user!.userId) {
 				res.status(403).json({
 					error: 'Not authorized to delete this prediction',
 				});
@@ -567,7 +567,7 @@ router.get(
 
 			// Find current user's rank
 			const userRank = leaderboardEntries.find(
-				(entry) => entry.userId === req.user!.id
+				(entry) => entry.userId === req.user!.userId
 			);
 
 			const response = {
